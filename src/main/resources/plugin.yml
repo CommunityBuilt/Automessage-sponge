@@ -1,0 +1,10 @@
+name: AutoMessage
+version: ${project.version}
+author: KasperFranz
+description: Schedule easily configurable broadcasts!
+website: http://www.communityBuilt.net
+main: com.TeamNovus.AutoMessage.AutoMessage
+commands:
+   automessage:
+     description: Main command for all AutoMessage commands
+     aliases: [automsg, am]
