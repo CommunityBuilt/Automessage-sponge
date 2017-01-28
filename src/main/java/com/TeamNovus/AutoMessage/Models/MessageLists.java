@@ -2,8 +2,10 @@ package com.TeamNovus.AutoMessage.Models;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
-import org.bukkit.Bukkit;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.scheduler.Task;
 
 import com.TeamNovus.AutoMessage.AutoMessage;
 import com.TeamNovus.AutoMessage.Tasks.BroadcastTask;
@@ -11,7 +13,7 @@ import com.TeamNovus.AutoMessage.Tasks.BroadcastTask;
 public class MessageLists {
 
     private static HashMap<String, MessageList> lists = new HashMap<String, MessageList>();
-
+    private static Task task ;
     public static HashMap<String, MessageList> getMessageLists() {
         return lists;
     }
@@ -59,14 +61,16 @@ public class MessageLists {
 
     public static void schedule() {
         unschedule();
-
+        
         for (Entry<String, MessageList> entry : lists.entrySet()) {
             MessageList list = lists.get(entry.getKey());
-            Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(AutoMessage.plugin, new BroadcastTask(list), 20 * list.getInterval(), 20 * list.getInterval());
+            task = Sponge.getScheduler().createTaskBuilder().delay(list.getInterval(), TimeUnit.SECONDS).interval(list.getInterval(), TimeUnit.SECONDS).execute(new BroadcastTask(list)).submit(AutoMessage.plugin);
         }
     }
 
     public static void unschedule() {
-        Bukkit.getScheduler().cancelTasks(AutoMessage.plugin);
+    	if(task != null){
+    		task.cancel();
+    	}
     }
 }

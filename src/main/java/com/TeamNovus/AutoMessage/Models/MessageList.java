@@ -1,14 +1,10 @@
 package com.TeamNovus.AutoMessage.Models;
 
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.text.Text;
 
 public class MessageList {
 
@@ -110,7 +106,7 @@ public class MessageList {
     }
 
     public void broadcast(int index) {
-        Bukkit.broadcastMessage(this.getMessage(index).getMessage());
+        Sponge.getServer().getBroadcastChannel().send(Text.of(this.getMessage(index).getMessage()));
     }
 
 }

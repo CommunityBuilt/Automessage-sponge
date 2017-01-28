@@ -1,7 +1,5 @@
 package com.TeamNovus.AutoMessage;
 
-import org.bukkit.command.CommandSender;
-
 public enum Permission {
 	COMMAND_RELOAD("commands.reload"),
 	COMMAND_ADD("commands.add"),
@@ -27,11 +25,7 @@ public enum Permission {
 		return node;
 	}
 
-	private static String getPermission(Permission permission) {
+	public static String getPermission(Permission permission) {
 		return "automessage." + permission.getNode();
-	}
-
-	public static Boolean has(Permission permission, CommandSender target) {
-		return target.hasPermission(getPermission(permission));
 	}
 }

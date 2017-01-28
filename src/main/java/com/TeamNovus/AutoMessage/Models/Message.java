@@ -1,10 +1,7 @@
 package com.TeamNovus.AutoMessage.Models;
 
-import org.bukkit.ChatColor;
-
 public class Message {
 
-    private String raw;
     private String message;
 
     public Message(String raw) {
@@ -16,8 +13,7 @@ public class Message {
     }
 
     public Message setMessage(String raw) {
-        this.raw = raw;
-        this.message = ChatColor.translateAlternateColorCodes("&".charAt(0), raw);
+        this.message = raw;
         return this;
     }
 }

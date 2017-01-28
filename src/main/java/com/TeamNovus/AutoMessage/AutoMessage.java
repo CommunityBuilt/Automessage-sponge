@@ -1,29 +1,179 @@
 package com.TeamNovus.AutoMessage;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.slf4j.Logger;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartingServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
+import org.spongepowered.api.plugin.Plugin;
 
-import com.TeamNovus.AutoMessage.Commands.DefaultCommands;
-import com.TeamNovus.AutoMessage.Commands.PluginCommands;
-import com.TeamNovus.AutoMessage.Commands.Common.BaseCommandExecutor;
-import com.TeamNovus.AutoMessage.Commands.Common.CommandManager;
+import com.TeamNovus.AutoMessage.Commands.Common.CommandHandler;
 import com.TeamNovus.AutoMessage.Models.Message;
 import com.TeamNovus.AutoMessage.Models.MessageList;
 import com.TeamNovus.AutoMessage.Models.MessageLists;
+import com.google.inject.Inject;
 
-public class AutoMessage extends JavaPlugin {
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
+
+@Plugin(id = "automessage", name = "auto message", version = "1.0")
+public class AutoMessage  {
 	public static AutoMessage plugin;
+	@Inject
+	private Logger logger;
+	private Game game;
+	private String name = "auto message";
+	
+	@Inject
+	@DefaultConfig(sharedRoot = true)
+	private Path defaultConfig;
 
-	@Override
+	@Inject
+	@DefaultConfig(sharedRoot = true)
+	private ConfigurationLoader<CommentedConfigurationNode> configManager;
+
+	@Inject
+	@ConfigDir(sharedRoot = false)
+	private Path privateConfigDir;
+	
+	private ConfigurationNode rootNode;
+	
+	@Listener
+	// logger and config files
+    public void onPreInit(GamePreInitializationEvent event) {
+		plugin = this;
+		System.out.println("PreInit");
+		
+		rootNode = null;
+		
+		try {
+		    rootNode = configManager.load();
+		} catch(IOException e) {
+		    // error
+		}
+
+		MessageLists.clear();
+
+		for (Object key : rootNode.getNode("message-lists").getChildrenMap().keySet().toArray()) {
+			
+			MessageList list = new MessageList();
+
+			if (rootNode.getNode("message-lists" , key , "enabled") != null)
+				list.setEnabled(rootNode.getNode("message-lists" , key , "enabled").getBoolean());
+
+			if (rootNode.getNode("message-lists" , key , "interval") != null)
+				list.setInterval(rootNode.getNode("message-lists" , key , "interval").getInt());
+
+
+			if (rootNode.getNode("message-lists" , key , "random") != null)
+				list.setRandom(rootNode.getNode("message-lists" , key , "random").getBoolean());
+
+			LinkedList<Message> finalMessages = new LinkedList<Message>();
+
+			if (rootNode.getNode("message-lists" , key , "messages") != null) {
+				ArrayList<Object> messages = (ArrayList<Object>) rootNode.getNode("message-lists" , key , "messages").getValue();
+
+				for (Object m : messages) {
+					if (m instanceof String) {
+						finalMessages.add(new Message((String) m));
+					} else if (m instanceof Map) {
+						Map<String, List<String>> message = (Map<String, List<String>>) m;
+						for (Entry<String, List<String>> entry : message.entrySet()) {
+							finalMessages.add(new Message(entry.getKey()));
+						}
+					}
+				}
+			}
+
+			list.setMessages(finalMessages);
+
+			MessageLists.setList(key.toString(), list);
+		}
+
+		MessageLists.schedule();
+
+		// Saves any version changes to the disk
+		saveConfiguration();
+		
+    }
+	
+	@Listener
+	//command registration
+    public void onServerStarting(GameStartingServerEvent event) {
+		System.out.println("ServerStarting");
+		CommandHandler.register();
+    }
+	
+	@Listener
+	//cleanup (no players are connected no changes to worlds are saved)
+    public void onServerStopped(GameStoppedServerEvent event) {
+		System.out.println("ServerStopping");
+		
+		MessageLists.unschedule();
+    }
+	
+	public void saveConfiguration() {
+		
+		for (String key : MessageLists.getMessageLists().keySet()) {
+			MessageList list = MessageLists.getExactList(key);
+			rootNode.getNode("message-lists" , key , "enabled").setValue(list.isEnabled());
+			rootNode.getNode("message-lists" , key , "interval").setValue(list.getInterval());
+			rootNode.getNode("message-lists" , key , "random").setValue(list.isRandom());
+
+			List<String> messages = new LinkedList<String>();
+
+			for (Message m : list.getMessages()) {
+				messages.add(m.getMessage());
+			}
+
+			rootNode.getNode("message-lists" , key , "messages").setValue(messages);
+		}
+
+		saveConfig();
+	}
+	
+	public Logger getLogger(){
+		return this.logger;
+	}
+	
+	@Inject
+	public void setGame(Game game){
+		this.game = game;
+	}
+	
+	public Game getGame(){
+		return game;
+	}
+	
+	public String getName(){
+		return name;
+	}
+	
+	public void saveConfig(){
+		try {
+			configManager.save(rootNode);
+		} catch(IOException e) {
+		    // error
+		}
+	}
+
+	public ConfigurationNode getRootNode() {
+		return rootNode;
+	}
+	
+	/*@Override
 	public void onEnable() {
 		plugin = this;
 
@@ -47,100 +197,12 @@ public class AutoMessage extends JavaPlugin {
 	}
 
 	public boolean loadConfig() {
-		if (!(new File(getDataFolder() + File.separator + "config.yml").exists())) {
-			saveDefaultConfig();
-		}
-
-
-		try {
-			new YamlConfiguration().load(new File(getDataFolder() + File.separator + "config.yml"));
-		} catch (Exception e) {
-			System.out.println("--- --- --- ---");
-			System.out.println("There was an error loading your configuration.");
-			System.out.println("A detailed description of your error is shown below.");
-			System.out.println("--- --- --- ---");
-			e.printStackTrace();
-			Bukkit.getPluginManager().disablePlugin(this);
-
-			return false;
-		}
-
-		reloadConfig();
-
-		MessageLists.clear();
-
-		for (String key : getConfig().getConfigurationSection("message-lists").getKeys(false)) {
-			MessageList list = new MessageList();
-
-			if (getConfig().contains("message-lists." + key + ".enabled"))
-				list.setEnabled(getConfig().getBoolean("message-lists." + key + ".enabled"));
-
-			if (getConfig().contains("message-lists." + key + ".interval"))
-				list.setInterval(getConfig().getInt("message-lists." + key + ".interval"));
-
-
-			if (getConfig().contains("message-lists." + key + ".random"))
-				list.setRandom(getConfig().getBoolean("message-lists." + key + ".random"));
-
-			LinkedList<Message> finalMessages = new LinkedList<Message>();
-
-			if (getConfig().contains("message-lists." + key + ".messages")) {
-				ArrayList<Object> messages = (ArrayList<Object>) getConfig().getList("message-lists." + key + ".messages");
-
-				for (Object m : messages) {
-					if (m instanceof String) {
-						finalMessages.add(new Message((String) m));
-					} else if (m instanceof Map) {
-						Map<String, List<String>> message = (Map<String, List<String>>) m;
-
-						for (Entry<String, List<String>> entry : message.entrySet()) {
-							finalMessages.add(new Message(entry.getKey()));
-						}
-					}
-				}
-			}
-
-			list.setMessages(finalMessages);
-
-			MessageLists.setList(key, list);
-		}
-
-		MessageLists.schedule();
-
-		// Saves any version changes to the disk
-		saveConfiguration();
-
-		return true;
+		
 	}
 
-	public void saveConfiguration() {
-		if (!(new File(getDataFolder() + File.separator + "config.yml").exists())) {
-			saveDefaultConfig();
-		}
-
-		for (String key : getConfig().getConfigurationSection("message-lists").getKeys(false)) {
-			getConfig().set("message-lists." + key, null);
-		}
-
-		for (String key : MessageLists.getMessageLists().keySet()) {
-			MessageList list = MessageLists.getExactList(key);
-			getConfig().set("message-lists." + key + ".enabled", list.isEnabled());
-			getConfig().set("message-lists." + key + ".interval", list.getInterval());
-			getConfig().set("message-lists." + key + ".random", list.isRandom());
-
-			List<String> messages = new LinkedList<String>();
-
-			for (Message m : list.getMessages()) {
-				messages.add(m.getMessage());
-			}
-
-			getConfig().set("message-lists." + key + ".messages", messages);
-		}
-
-		saveConfig();
-	}
+	
 
 	public File getFile() {
 		return super.getFile();
-	}
+	}*/
 }
