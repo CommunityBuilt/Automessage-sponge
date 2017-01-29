@@ -51,8 +51,6 @@ public class CommandHandler {
 		
 		SimpleDispatcher rootCommand = new SimpleDispatcher(new BaseCommand());
 		
-		AutoMessage.plugin.getLogger().warn("[AM]",AutoMessage.plugin);
-		
 		rootCommand.register(new HelpCommand(), "help", "?");
 		rootCommand.register(new ReloadCommand(), "reload", "rl");
 		

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 public class MessageList {
 
@@ -106,7 +106,6 @@ public class MessageList {
     }
 
     public void broadcast(int index) {
-        Sponge.getServer().getBroadcastChannel().send(Text.of(this.getMessage(index).getMessage()));
+        Sponge.getServer().getBroadcastChannel().send(TextSerializers.FORMATTING_CODE.deserializeUnchecked(this.getMessage(index).getMessage()));
     }
-
 }

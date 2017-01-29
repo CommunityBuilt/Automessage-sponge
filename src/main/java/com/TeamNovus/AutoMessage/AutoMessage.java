@@ -58,51 +58,7 @@ public class AutoMessage  {
 		
 		rootNode = null;
 		
-		try {
-		    rootNode = configManager.load();
-		} catch(IOException e) {
-		    // error
-		}
-
-		MessageLists.clear();
-
-		for (Object key : rootNode.getNode("message-lists").getChildrenMap().keySet().toArray()) {
-			
-			MessageList list = new MessageList();
-
-			if (rootNode.getNode("message-lists" , key , "enabled") != null)
-				list.setEnabled(rootNode.getNode("message-lists" , key , "enabled").getBoolean());
-
-			if (rootNode.getNode("message-lists" , key , "interval") != null)
-				list.setInterval(rootNode.getNode("message-lists" , key , "interval").getInt());
-
-
-			if (rootNode.getNode("message-lists" , key , "random") != null)
-				list.setRandom(rootNode.getNode("message-lists" , key , "random").getBoolean());
-
-			LinkedList<Message> finalMessages = new LinkedList<Message>();
-
-			if (rootNode.getNode("message-lists" , key , "messages") != null) {
-				ArrayList<Object> messages = (ArrayList<Object>) rootNode.getNode("message-lists" , key , "messages").getValue();
-
-				for (Object m : messages) {
-					if (m instanceof String) {
-						finalMessages.add(new Message((String) m));
-					} else if (m instanceof Map) {
-						Map<String, List<String>> message = (Map<String, List<String>>) m;
-						for (Entry<String, List<String>> entry : message.entrySet()) {
-							finalMessages.add(new Message(entry.getKey()));
-						}
-					}
-				}
-			}
-
-			list.setMessages(finalMessages);
-
-			MessageLists.setList(key.toString(), list);
-		}
-
-		MessageLists.schedule();
+		loadConfig();
 
 		// Saves any version changes to the disk
 		saveConfiguration();
@@ -171,6 +127,54 @@ public class AutoMessage  {
 
 	public ConfigurationNode getRootNode() {
 		return rootNode;
+	}
+
+	public void loadConfig() {
+		try {
+		    rootNode = configManager.load();
+		} catch(IOException e) {
+		    // error
+		}
+
+		MessageLists.clear();
+
+		for (Object key : rootNode.getNode("message-lists").getChildrenMap().keySet().toArray()) {
+			
+			MessageList list = new MessageList();
+
+			if (rootNode.getNode("message-lists" , key , "enabled") != null)
+				list.setEnabled(rootNode.getNode("message-lists" , key , "enabled").getBoolean());
+
+			if (rootNode.getNode("message-lists" , key , "interval") != null)
+				list.setInterval(rootNode.getNode("message-lists" , key , "interval").getInt());
+
+
+			if (rootNode.getNode("message-lists" , key , "random") != null)
+				list.setRandom(rootNode.getNode("message-lists" , key , "random").getBoolean());
+
+			LinkedList<Message> finalMessages = new LinkedList<Message>();
+
+			if (rootNode.getNode("message-lists" , key , "messages") != null) {
+				ArrayList<Object> messages = (ArrayList<Object>) rootNode.getNode("message-lists" , key , "messages").getValue();
+
+				for (Object m : messages) {
+					if (m instanceof String) {
+						finalMessages.add(new Message((String) m));
+					} else if (m instanceof Map) {
+						Map<String, List<String>> message = (Map<String, List<String>>) m;
+						for (Entry<String, List<String>> entry : message.entrySet()) {
+							finalMessages.add(new Message(entry.getKey()));
+						}
+					}
+				}
+			}
+
+			list.setMessages(finalMessages);
+
+			MessageLists.setList(key.toString(), list);
+		}
+
+		MessageLists.schedule();
 	}
 	
 	/*@Override

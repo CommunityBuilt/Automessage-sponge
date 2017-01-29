@@ -11,7 +11,9 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import com.TeamNovus.AutoMessage.AutoMessage;
 import com.TeamNovus.AutoMessage.Permission;
+import com.TeamNovus.AutoMessage.Commands.Common.CommandHandler;
 
 public class ReloadCommand implements CommandCallable {
 
@@ -43,9 +45,9 @@ public class ReloadCommand implements CommandCallable {
 
 	@Override
 	public CommandResult process(CommandSource sender, String args) throws CommandException {
-        /*AutoMessage.plugin.loadConfig();
+        AutoMessage.plugin.loadConfig();
 
-        sender.sendMessage(ChatColor.GREEN + "Configuration reloaded from disk!");*/
+        sender.sendMessage(Text.of(CommandHandler.getLight() + "Configuration reloaded from disk!"));
 		return CommandResult.success();
 	}
 
