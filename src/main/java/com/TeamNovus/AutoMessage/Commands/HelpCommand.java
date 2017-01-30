@@ -15,8 +15,8 @@ import com.TeamNovus.AutoMessage.Permission;
 
 public class HelpCommand implements CommandCallable{
 
-	private final Optional<Text> desc = Optional.of(Text.of("View all commands and their info."));
-    private final Optional<Text> help = Optional.of(Text.of("View all commands and their info."));
+	private final Optional<Text> desc = Optional.of(Text.of("View all commands and their info.").toText());
+    private final Optional<Text> help = Optional.of(Text.of("View all commands and their info.").toText());
     private final Text usage = Text.of("[Page]");
     
 

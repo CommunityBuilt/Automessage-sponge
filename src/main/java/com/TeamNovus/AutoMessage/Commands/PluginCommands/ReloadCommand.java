@@ -17,8 +17,8 @@ import com.TeamNovus.AutoMessage.Commands.Common.CommandHandler;
 
 public class ReloadCommand implements CommandCallable {
 
-	private final Optional<Text> desc = Optional.of(Text.of("Reload the configuration from the disk."));
-    private final Optional<Text> help = Optional.of(Text.of("Reload the configuration from the disk."));
+	private final Optional<Text> desc = Optional.of(Text.of("Reload the configuration from the disk.").toText());
+    private final Optional<Text> help = Optional.of(Text.of("Reload the configuration from the disk.").toText());
     private final Text usage = Text.of("");
     
 
