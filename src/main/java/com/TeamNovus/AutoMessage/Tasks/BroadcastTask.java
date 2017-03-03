@@ -13,7 +13,6 @@ public class BroadcastTask implements Runnable {
         this.list = list;
     }
 
-    @Override
     public void run() {
         if (AutoMessage.plugin.getRootNode().getNode("settings","enabled").getBoolean() && list.isEnabled() && list.hasMessages()) {
             int index = list.isRandom() ? new Random().nextInt(list.getMessages().size()) : list.getCurrentIndex();

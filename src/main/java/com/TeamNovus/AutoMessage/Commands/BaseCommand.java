@@ -13,7 +13,6 @@ import com.TeamNovus.AutoMessage.Commands.Common.CommandHandler;
 
 public class BaseCommand implements Disambiguator{
 	
-	@Override
 	public Optional<CommandMapping> disambiguate(CommandSource source, String aliasUsed, List<CommandMapping> availableOptions) {
 		source.sendMessage(Text.of(CommandHandler.getExtra() + "__________________.[ " + CommandHandler.getHighlight() + AutoMessage.plugin.getName() + CommandHandler.getExtra() + " ].__________________"));
 	    /*sender.sendMessage(CommandHandler.getDark() + "Description: " + CommandHandler.getLight() + AutoMessage.plugin.getDescription().getDescription());

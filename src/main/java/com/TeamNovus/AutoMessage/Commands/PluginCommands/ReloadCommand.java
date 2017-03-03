@@ -1,58 +1,27 @@
 package com.TeamNovus.AutoMessage.Commands.PluginCommands;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import com.TeamNovus.AutoMessage.AutoMessage;
-import com.TeamNovus.AutoMessage.Permission;
 import com.TeamNovus.AutoMessage.Commands.Common.CommandHandler;
 
-public class ReloadCommand implements CommandCallable {
+public class ReloadCommand implements CommandExecutor  {
 
-	private final Optional<Text> desc = Optional.of(Text.of("Reload the configuration from the disk.").toText());
-    private final Optional<Text> help = Optional.of(Text.of("Reload the configuration from the disk.").toText());
-    private final Text usage = Text.of("");
-    
-
-	@Override
-	public Optional<Text> getHelp(CommandSource arg0) {
-		return help;
+	public final AutoMessage plugin;
+	
+	public ReloadCommand(AutoMessage plugin) {
+		this.plugin = plugin;
 	}
+	
+	public CommandResult execute(CommandSource sender, CommandContext context) throws CommandException {
+        plugin.loadConfig();
 
-	@Override
-	public Optional<Text> getShortDescription(CommandSource arg0) {
-		return desc;
-	}
-
-	@Override
-	public List<String> getSuggestions(CommandSource arg0, String arg1, Location<World> arg2) throws CommandException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Text getUsage(CommandSource arg0) {
-		return usage;
-	}
-
-	@Override
-	public CommandResult process(CommandSource sender, String args) throws CommandException {
-        AutoMessage.plugin.loadConfig();
-
-        sender.sendMessage(Text.of(CommandHandler.getLight() + "Configuration reloaded from disk!"));
+        sender.sendMessage(Text.builder().color(CommandHandler.getLight()).append(Text.of("Configuration reloaded from disk!")).build());
 		return CommandResult.success();
-	}
-
-	@Override
-	public boolean testPermission(CommandSource src) {
-		return src.hasPermission(Permission.getPermission(Permission.COMMAND_RELOAD));
 	}
 }

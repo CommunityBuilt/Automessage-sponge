@@ -64,7 +64,9 @@ public class MessageLists {
         
         for (Entry<String, MessageList> entry : lists.entrySet()) {
             MessageList list = lists.get(entry.getKey());
-            task = Sponge.getScheduler().createTaskBuilder().delay(list.getInterval(), TimeUnit.SECONDS).interval(list.getInterval(), TimeUnit.SECONDS).execute(new BroadcastTask(list)).submit(AutoMessage.plugin);
+            if(list.isEnabled()){
+            	task = Sponge.getScheduler().createTaskBuilder().delay(list.getInterval(), TimeUnit.SECONDS).interval(list.getInterval(), TimeUnit.SECONDS).execute(new BroadcastTask(list)).submit(AutoMessage.plugin);
+            }
         }
     }
 

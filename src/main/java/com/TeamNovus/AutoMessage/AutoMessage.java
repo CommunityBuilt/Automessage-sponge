@@ -176,37 +176,4 @@ public class AutoMessage  {
 
 		MessageLists.schedule();
 	}
-	
-	/*@Override
-	public void onEnable() {
-		plugin = this;
-
-		// Setup the base command.
-		getCommand("automessage").setExecutor(new BaseCommandExecutor());
-
-		// Register additional commands.
-		CommandManager.register(DefaultCommands.class);
-		CommandManager.register(PluginCommands.class);
-
-		// Load the configuration.
-		if (loadConfig()) {
-		}
-	}
-
-	@Override
-	public void onDisable() {
-		MessageLists.unschedule();
-
-		plugin = null;
-	}
-
-	public boolean loadConfig() {
-		
-	}
-
-	
-
-	public File getFile() {
-		return super.getFile();
-	}*/
 }
