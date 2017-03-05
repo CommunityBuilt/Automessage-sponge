@@ -1,9 +1,12 @@
 package com.TeamNovus.AutoMessage.Models;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 public class MessageList {
@@ -106,6 +109,18 @@ public class MessageList {
     }
 
     public void broadcast(int index) {
-        Sponge.getServer().getBroadcastChannel().send(TextSerializers.FORMATTING_CODE.deserializeUnchecked(this.getMessage(index).getMessage()));
+    	String mess = this.getMessage(index).getMessage();
+    	URL url;
+    	for(String s : mess.split(" ")){
+    		if(s.matches("(.*)://(.*)")){
+    			try {
+					url = new URL(s);
+	    	        Sponge.getServer().getBroadcastChannel().send(TextSerializers.FORMATTING_CODE.deserializeUnchecked(mess).builder().onClick(TextActions.openUrl(url)).build());
+	    	        return;
+				} catch (MalformedURLException e) {
+				}
+    		}
+    	}
+        Sponge.getServer().getBroadcastChannel().send(TextSerializers.FORMATTING_CODE.deserializeUnchecked(mess));
     }
 }
