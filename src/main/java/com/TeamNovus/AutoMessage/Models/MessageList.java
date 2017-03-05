@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
@@ -111,16 +112,19 @@ public class MessageList {
     public void broadcast(int index) {
     	String mess = this.getMessage(index).getMessage();
     	URL url;
+    	String beforemess = "";
+    	Text text = Text.of("");
     	for(String s : mess.split(" ")){
-    		if(s.matches("(.*)://(.*)")){
-    			try {
-					url = new URL(s);
-	    	        Sponge.getServer().getBroadcastChannel().send(TextSerializers.FORMATTING_CODE.deserializeUnchecked(mess).builder().onClick(TextActions.openUrl(url)).build());
-	    	        return;
-				} catch (MalformedURLException e) {
-				}
+    		
+			try {
+				url = new URL(s);
+    	        Text.builder().append(TextSerializers.FORMATTING_CODE.deserializeUnchecked(beforemess).builder().append(Text.builder(s).onClick(TextActions.openUrl(url)).build()).build()).build();
+    	        beforemess = "";
+			} catch (MalformedURLException e) {
+				beforemess += s + " ";
     		}
     	}
-        Sponge.getServer().getBroadcastChannel().send(TextSerializers.FORMATTING_CODE.deserializeUnchecked(mess));
+    	text.builder().append(TextSerializers.FORMATTING_CODE.deserializeUnchecked(beforemess)).build();
+        Sponge.getServer().getBroadcastChannel().send(text);
     }
 }
