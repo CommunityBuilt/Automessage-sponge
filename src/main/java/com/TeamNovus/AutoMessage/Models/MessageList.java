@@ -2,13 +2,19 @@ package com.TeamNovus.AutoMessage.Models;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextFormat;
 import org.spongepowered.api.text.serializer.TextSerializers;
+
+import com.google.common.collect.ImmutableList;
 
 public class MessageList {
 
@@ -111,20 +117,85 @@ public class MessageList {
 
     public void broadcast(int index) {
     	String mess = this.getMessage(index).getMessage();
-    	URL url;
-    	String beforemess = "";
-    	Text text = Text.of("");
-    	for(String s : mess.split(" ")){
-    		
-			try {
-				url = new URL(s);
-    	        Text.builder().append(TextSerializers.FORMATTING_CODE.deserializeUnchecked(beforemess).builder().append(Text.builder(s).onClick(TextActions.openUrl(url)).build()).build()).build();
-    	        beforemess = "";
-			} catch (MalformedURLException e) {
-				beforemess += s + " ";
-    		}
-    	}
-    	text.builder().append(TextSerializers.FORMATTING_CODE.deserializeUnchecked(beforemess)).build();
-        Sponge.getServer().getBroadcastChannel().send(text);
+        Sponge.getServer().getBroadcastChannel().send(Text.of(deserializeText(mess)));
+    }
+    
+    private static  Text mergeToText(String[] strs, String[] urls, boolean startWithUrl) {
+        Text.Builder builder = Text.builder();
+        mergeToText(builder, strs, urls, startWithUrl, 0, 0);
+        return builder.build();
+    }
+
+    private static void mergeToText(Text.Builder builder, String[] strs, String[] urls, boolean startWithUrl, int startStrs, int startUrls) {
+        if (startStrs > strs.length && startUrls > urls.length)
+            return;
+
+        TextFormat lastTextFormat = TextFormat.NONE;
+
+        // Text formatting doesn't propagate from url to the next non-url string
+        // Text formatting propagates from non-url string to the next url
+        if (startWithUrl){
+            if (startUrls < urls.length)
+                try {
+                    Text t = deserializeURLToText(urls[startUrls], lastTextFormat);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            if (startStrs < strs.length)
+                builder.append(deserializeText(strs[startStrs]));
+        } else {
+            if (startStrs < strs.length) {
+                Text t = deserializeText(strs[startStrs]);
+                builder.append(t);
+                lastTextFormat = lastTextFormat(t);
+            }
+            if (startUrls < urls.length)
+                try {
+                    builder.append(deserializeURLToText(urls[startUrls], lastTextFormat));
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+        }
+
+        mergeToText(builder, strs, urls, startWithUrl, startStrs + 1, startUrls + 1);
+    }
+    
+    private static Text deserializeURLToText(String url, TextFormat format) throws MalformedURLException {
+        return Text.builder(url).onClick(TextActions.openUrl(new URL(url))).format(format).build();
+    }
+    
+    public static Text deserializeText(String str, boolean parseUrl){
+        if (!parseUrl)
+            return TextSerializers.FORMATTING_CODE.deserialize(str);
+
+        final String URL_REGEX = "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&\\/=]*)";
+        Pattern urlPattern = Pattern.compile(URL_REGEX);
+        Matcher m = urlPattern.matcher(str);
+        List<String> urls = new ArrayList<String>();    // List of the urls in the string.
+
+        while(m.find())
+            urls.add(m.group());
+
+        if (urls.isEmpty())     // URL not found
+            return deserializeText(str);
+
+        String[] nonUrlStr = str.split(URL_REGEX);      // Slitting the message for remove urls.
+
+        boolean startWithUrl = str.startsWith(urls.get(0));     // true if the message start with an url
+
+        // Links are merged with the rest of the message in the original position
+        return mergeToText(nonUrlStr, urls.toArray(new String[urls.size()]), startWithUrl);
+    }
+    
+    public static Text deserializeText(String str){
+        return deserializeText(str, false);
+    }
+    
+    private static TextFormat lastTextFormat(Text t){
+        if (t.getChildren().isEmpty())
+            return t.getFormat();
+
+        ImmutableList<Text> children = t.getChildren();
+        return lastTextFormat(children.get(children.size() - 1));
     }
 }
