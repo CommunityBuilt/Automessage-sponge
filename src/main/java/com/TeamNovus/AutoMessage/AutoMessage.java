@@ -54,7 +54,6 @@ public class AutoMessage  {
 	// logger and config files
     public void onPreInit(GamePreInitializationEvent event) {
 		plugin = this;
-		System.out.println("PreInit");
 		
 		rootNode = null;
 		
@@ -68,15 +67,12 @@ public class AutoMessage  {
 	@Listener
 	//command registration
     public void onServerStarting(GameStartingServerEvent event) {
-		System.out.println("ServerStarting");
 		CommandHandler.register();
     }
 	
 	@Listener
 	//cleanup (no players are connected no changes to worlds are saved)
     public void onServerStopped(GameStoppedServerEvent event) {
-		System.out.println("ServerStopping");
-		
 		MessageLists.unschedule();
     }
 	
