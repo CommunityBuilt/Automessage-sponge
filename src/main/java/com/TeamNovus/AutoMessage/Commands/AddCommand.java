@@ -18,14 +18,10 @@ import com.TeamNovus.AutoMessage.Util.Utils;
 
 public class AddCommand implements CommandExecutor{
 
-	public final AutoMessage plugin;
-	
-	public AddCommand(AutoMessage plugin) {
-		this.plugin = plugin;
-	}
+
 	
 	public CommandResult execute(CommandSource sender, CommandContext ctx) throws CommandException {
-		final Optional<Object> listName = ctx.getOne("Listname");
+		final Optional<Object> listName = ctx.getOne("name");
 		final Optional<Object> Index = ctx.getOne("index");
 		final Optional<Object> Message = ctx.getOne("message");
 		

@@ -35,11 +35,11 @@ public class HelpCommand implements CommandExecutor{
 		for (int i = maxLines * page - maxLines; i < CommandManager.getCommands().size() && total < maxLines - 1; i++) {
 			BaseCommand command = CommandManager.getCommands().get(i);
 			if (!(command.hidden()) && Permission.has(command.permission(), sender)) {
-				sender.sendMessage(CommandManager.getExtra() + " - " + CommandManager.getDark() + "/" + commandLabel + " " + command.aliases()[0] + (!(command.usage().equals("")) ? " " + command.usage() : "") + ": " + CommandManager.getLight() + command.desc());
+				sender.sendMessage(CommandManager.getExtra() + " - " + CommandManager.getDark() + "/" + commandLabel + " " + command.aliases()[0] + (!(command.usage().equals("")) ? " " + command.usage() : "") + ": " + CommandManager.light + command.desc());
 				total++;
 			}
 		}
-		sender.sendMessage(CommandManager.getLight() + "For help type: " + CommandManager.getHighlight() + "/" + commandLabel + " help [Page]");
+		sender.sendMessage(CommandManager.light + "For help type: " + CommandManager.getHighlight() + "/" + commandLabel + " help [Page]");
 		sender.sendMessage(CommandManager.getExtra() + "---------------------------------------------------");*/
 		return CommandResult.success();
 	}

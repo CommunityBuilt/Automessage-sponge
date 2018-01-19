@@ -12,21 +12,14 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import com.TeamNovus.AutoMessage.AutoMessage;
 import com.TeamNovus.AutoMessage.Models.Message;
 import com.TeamNovus.AutoMessage.Models.MessageList;
 import com.TeamNovus.AutoMessage.Models.MessageLists;
 
 public class ListAllCommand implements CommandExecutor  {
 
-	public final AutoMessage plugin;
-	
-	public ListAllCommand(AutoMessage plugin) {
-		this.plugin = plugin;
-	}
-	
 	public CommandResult execute(CommandSource sender, CommandContext ctx) throws CommandException {
-		final Optional<Object> listName = ctx.getOne("Listname");
+		final Optional<Object> listName = ctx.getOne("name");
 		if (!listName.isPresent()) {
             if (MessageLists.getMessageLists().keySet().size() != 0) {
                 sender.sendMessage(Text.builder().color(TextColors.DARK_RED).append(Text.of("Availiable Lists:")).build());

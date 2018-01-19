@@ -17,14 +17,8 @@ import com.TeamNovus.AutoMessage.Util.Utils;
 
 public class RemoveCommad implements CommandExecutor {
 
-	public final AutoMessage plugin;
-	
-	public RemoveCommad(AutoMessage plugin) {
-		this.plugin = plugin;
-	}
-	
 	public CommandResult execute(CommandSource sender, CommandContext ctx) throws CommandException {
-		final Optional<Object> listName = ctx.getOne("Listname");
+		final Optional<Object> listName = ctx.getOne("name");
 		final Optional<Object> Index = ctx.getOne("index");
 		if(listName.isPresent()){
 			if (!Index.isPresent()) {

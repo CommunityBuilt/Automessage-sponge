@@ -10,21 +10,14 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import com.TeamNovus.AutoMessage.AutoMessage;
 import com.TeamNovus.AutoMessage.Models.MessageList;
 import com.TeamNovus.AutoMessage.Models.MessageLists;
 import com.TeamNovus.AutoMessage.Util.Utils;
 
 public class BroadCastCommand implements CommandExecutor  {
-
-	public final AutoMessage plugin;
-	
-	public BroadCastCommand(AutoMessage plugin) {
-		this.plugin = plugin;
-	}
 	
 	public CommandResult execute(CommandSource sender, CommandContext ctx) throws CommandException {
-		final Optional<Object> listName = ctx.getOne("Listname");
+		final Optional<Object> listName = ctx.getOne("name");
 		final Optional<Object> number = ctx.getOne("number");
 		
         if (listName.isPresent()) {

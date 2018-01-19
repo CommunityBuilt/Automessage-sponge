@@ -16,14 +16,8 @@ import com.TeamNovus.AutoMessage.Models.MessageLists;
 
 public class RandomCommand implements CommandExecutor  {
 
-	public final AutoMessage plugin;
-	
-	public RandomCommand(AutoMessage plugin) {
-		this.plugin = plugin;
-	}
-	
 	public CommandResult execute(CommandSource sender, CommandContext ctx) throws CommandException {
-		final Optional<Object> listName = ctx.getOne("Listname");
+		final Optional<Object> listName = ctx.getOne("name");
 		if (listName.isPresent()) {
 			MessageList list = MessageLists.getBestList((String)listName.get());
 			

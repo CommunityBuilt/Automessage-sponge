@@ -17,14 +17,8 @@ import com.TeamNovus.AutoMessage.Util.Utils;
 
 public class SetIntervalCommand implements CommandExecutor  {
 
-	public final AutoMessage plugin;
-	
-	public SetIntervalCommand(AutoMessage plugin) {
-		this.plugin = plugin;
-	}
-	
 	public CommandResult execute(CommandSource sender, CommandContext ctx) throws CommandException {
-        final Optional<Object> ListName = ctx.getOne("Listname");
+        final Optional<Object> ListName = ctx.getOne("name");
         final Optional<Object> number = ctx.getOne("number");
         
         if(ListName.isPresent()){
